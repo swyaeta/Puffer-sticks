@@ -3,7 +3,8 @@ Power Puff girls themed desktop sticky notes app
 # Puffy-notes
 
 Puffy-notes is a lightweight desktop sticky-notes application built with Python and Tkinter. It provides a simple space for users to create and write notes through a colourful interface inspired by the Powerpuff Girls.
-## demo-look:
+## demo-look:<img width="1549" height="648" alt="Screenshot (1863)" src="https://github.com/user-attachments/assets/5448e3e7-865c-4324-847d-2e03fc09725f" />
+
 
 ## Features
 
