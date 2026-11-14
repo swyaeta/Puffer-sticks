@@ -1,87 +1,185 @@
-
 import tkinter
 from PIL import Image, ImageTk
 
 notes = tkinter.Tk()
-notes.title("Puffy-notes")
-notes.geometry("340x400")
-notes.configure(bg="#FC824E")
+notes.withdraw()
 
 blossom_img = ImageTk.PhotoImage(Image.open("blossom.png").resize((100, 100)))
 buttercup_img = ImageTk.PhotoImage(Image.open("buttercup.png").resize((95, 95)))
 bubbles_img = ImageTk.PhotoImage(Image.open("bubbles.png").resize((95, 95)))
 
-button = tkinter.Button(notes, text="Theme", width=8, height=2, font=("Arial", 10, "bold"))
+all_notes = []
 
-plus_button = tkinter.Button(
-    notes, text="+", width=3, height=1,
-    font=("Arial", 16, "bold"), command=lambda: add_note()
-)
 
-title = tkinter.Label(
-    notes, text="Blossom!", bg="#FC824E",
-    font=("Arial", 18, "bold"), fg="#BC0303"
-)
+def get_theme_details(theme):
+    if theme == 1:
+        return "#FC824E", "#F5A2BB", "#170202", "Blossom!", "#BC0303", blossom_img
 
-note = tkinter.Text(
-    notes, width=35, height=18,
-    bg="#F5A2BB", fg="#170202",
-    font=("Arial", 12, "bold")
-)
+    elif theme == 2:
+        return "#111111", "#3DC94B", "#021702", "Buttercup!", "#FAF3F3", buttercup_img
 
-picture = tkinter.Label(notes, image=blossom_img, bg="#FC824E")
+    else:
+        return "#F9D36A", "#A2D8F5", "#021327", "Bubbles!", "#5188B5", bubbles_img
 
-picture.place(x=5, y=5)
-plus_button.place(x=295, y=5)
 
-button.pack(pady=(50, 10))
-title.pack(pady=10)
-note.pack(pady=5)
+def cursor_effect(text_area):
+    text_area.config(insertontime=0)
 
-theme = 1
+    text_area.bind(
+        "<Enter>",
+        lambda event: text_area.config(insertontime=600)
+    )
 
-def add_note():
+    text_area.bind(
+        "<Leave>",
+        lambda event: text_area.config(insertontime=0)
+    )
+
+
+def check_windows():
+    for item in all_notes:
+        if item["window"].winfo_exists():
+            return
+
+    notes.destroy()
+
+
+def create_note(theme=1, content=""):
+
+    if theme not in (1, 2, 3):
+        theme = 1
+
     new_note = tkinter.Toplevel(notes)
-    new_note.title("New Note")
-    new_note.geometry("300x250")
-    new_note.configure(bg="#F5A2BB")
+
+    x = 100 + (len(all_notes) % 6) * 30
+    y = 100 + (len(all_notes) % 6) * 30
+
+    new_note.geometry(f"340x400+{x}+{y}")
+
+    window_bg, note_bg, note_fg, title_text, title_fg, character_img = get_theme_details(theme)
+
+    new_note.title("Puffy-notes | " + title_text)
+    new_note.configure(bg=window_bg)
+
+    top_frame = tkinter.Frame(
+        new_note,
+        bg=window_bg
+    )
+
+    top_frame.pack(fill="x")
+
+    new_picture = tkinter.Label(
+        top_frame,
+        image=character_img,
+        bg=window_bg
+    )
+
+    new_picture.pack(side="left", padx=5)
+
+    button_frame = tkinter.Frame(
+        top_frame,
+        bg=window_bg
+    )
+
+    button_frame.pack(side="right", padx=5)
+
+    plus_button = tkinter.Button(
+        button_frame,
+        text="+",
+        width=3,
+        font=("Arial", 14, "bold"),
+        command=lambda: create_note(1)
+    )
+
+    plus_button.pack(side="left", padx=2)
+
+    theme_button = tkinter.Button(
+        button_frame,
+        text="Theme",
+        font=("Arial", 9, "bold")
+    )
+
+    theme_button.pack(side="left", padx=2)
+
+    new_title = tkinter.Label(
+        new_note,
+        text=title_text,
+        bg=window_bg,
+        font=("Arial", 18, "bold"),
+        fg=title_fg
+    )
+
+    new_title.pack(pady=5)
 
     new_text = tkinter.Text(
         new_note,
-        width=30,
+        width=35,
         height=12,
-        bg="#F5A2BB",
-        fg="#170202",
-        font=("Arial", 11)
+        bg=note_bg,
+        fg=note_fg,
+        font=("Arial", 12, "bold")
     )
-    new_text.pack(padx=10, pady=10, fill="both", expand=True)
 
-def change_theme():
-    global theme
+    new_text.pack(
+        padx=5,
+        pady=5,
+        fill="both",
+        expand=True
+    )
 
-    theme += 1
+    new_text.insert("1.0", content)
 
-    if theme == 4:
-        theme = 1
+    cursor_effect(new_text)
 
-    if theme == 1:
-        notes.configure(bg="#FC824E")
-        title.config(text="Blossom!", bg="#FC824E", fg="#BC0303")
-        note.config(bg="#F5A2BB", fg="#170202")
-        picture.config(image=blossom_img, bg="#FC824E")
+    item = {
+        "window": new_note,
+        "text": new_text,
+        "theme": theme
+    }
 
-    elif theme == 2:
-        notes.configure(bg="#111111")
-        title.config(text="Buttercup!", bg="#111111", fg="#FAF3F3")
-        note.config(bg="#3DC94B", fg="#021702")
-        picture.config(image=buttercup_img, bg="#111111")
+    all_notes.append(item)
 
-    elif theme == 3:
-        notes.configure(bg="#F9D36A")
-        title.config(text="Bubbles!", bg="#F9D36A", fg="#5188B5")
-        note.config(bg="#A2D8F5", fg="#021327")
-        picture.config(image=bubbles_img, bg="#F9D36A")
+    def change_theme():
+        item["theme"] += 1
 
-button.config(command=change_theme)
+        if item["theme"] > 3:
+            item["theme"] = 1
 
+        bg, text_bg, text_fg, name, color, image = get_theme_details(item["theme"])
+
+        new_note.configure(bg=bg)
+        top_frame.configure(bg=bg)
+        button_frame.configure(bg=bg)
+        new_picture.configure(image=image, bg=bg)
+        new_title.configure(text=name, bg=bg, fg=color)
+        new_text.configure(bg=text_bg, fg=text_fg)
+
+        new_note.title("Puffy-notes | " + name)
+
+    theme_button.config(command=change_theme)
+
+    def delete_note():
+        if item in all_notes:
+            all_notes.remove(item)
+        new_note.destroy()
+        check_windows()
+
+    delete_button = tkinter.Button(
+        new_note,
+        text="🗑 Delete",
+        command=delete_note,
+        font=("Arial", 10, "bold"),
+        bg="#FF6B6B",
+        fg="white"
+    )
+
+    delete_button.pack(side="bottom", pady=8)
+
+    new_note.protocol(
+        "WM_DELETE_WINDOW",
+        delete_note
+    )
+
+    return new_note
+create_note(1)
 notes.mainloop()
