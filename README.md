@@ -18,13 +18,10 @@ Puffy-notes is a lightweight desktop sticky-notes application built with Python 
 - Pillow (PIL)
 
 ## Installation
-
 1. Visit the [Releases](../../releases) section.
 2. Download `Puffy-notes-Windows.zip`.
 3. Extract the ZIP file.
 4. Run `Puffy-notes.exe`.
 
 ## Thanxs for reading hope you like project
-## Developer
 
-Developed as a personal desktop application project using Python and Tkinter.
